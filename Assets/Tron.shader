@@ -57,7 +57,7 @@
 				//else {
 					//return float4(_BaseColor.rgb, 1.0);
 				//}
-				return float4(dot(n, v), 0, 0, 1);
+				return float4(1 - dot(n, v), 0, 0, 1);
 			}
 			ENDCG
 		}
