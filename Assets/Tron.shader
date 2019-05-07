@@ -51,12 +51,13 @@
 			{
 				float3 n = normalize(i.normal);
 				float3 v = normalize(i.vertex - _WorldSpaceCameraPos);
-				if (dot(v, n) == 0) {
-					return float4(_RimColor.rgb, 1.0);
-				}
-				else {
-					return float4(_BaseColor.rgb, 1.0);
-				}
+				//if (dot(v, n) == 0) {
+					//return float4(_RimColor.rgb, 1.0);
+				//}
+				//else {
+					//return float4(_BaseColor.rgb, 1.0);
+				//}
+				return float4(dot(n, v), 0, 0, 1);
 			}
 			ENDCG
 		}
