@@ -6,12 +6,13 @@ Shader "Custom/Terrain"
 		_Color("Color", Color) = (1, 1, 1, 1) //The color of our object
 		_Shininess("Shininess", Float) = 32 //Shininess
 		_SpecColor("Specular Color", Color) = (1, 1, 1, 1) //Specular highlights color
-		_DirtTex("DirtTexture", 2D) = "white" {}
+		_WaterTex("DirtTexture", 2D) = "white" {}
 		_GrassTex("GrassTexture", 2D) = "white" {}
 		_SnowTex("SnowTexture", 2D) = "white" {}
 		_HeightMapTex("HeightMapTexture", 2D) = "white" {}
 		_Cube("Cubemap", CUBE) = "" {}
 		_DisplacementAmt("Displacement", Float) = 1.0
+		_WaterLevel("Water Level", Range(0.0, 1.0)) = 0.5
 	}
 
 		SubShader
@@ -33,12 +34,13 @@ Shader "Custom/Terrain"
 				uniform float4 _Color;
 				uniform float4 _SpecColor;
 				uniform float _Shininess;
-				uniform sampler2D _DirtTex;
+				uniform sampler2D _WaterTex;
 				uniform sampler2D _SnowTex;
 				uniform sampler2D _GrassTex;
 				uniform sampler2D _HeightMapTex;
 				samplerCUBE _Cube;
 				uniform float _DisplacementAmt;
+				uniform float _WaterLevel;
 
 
 				struct appdata
@@ -76,14 +78,11 @@ Shader "Custom/Terrain"
 					o.uv = v.uv;
 					o.heightVal = newPosition.y;
 
-
-
 					return o;
 			   }
 
 			   fixed4 frag(v2f i) : SV_Target
 			   {
-
 					float3 P = i.vertexInWorldCoords.xyz;
 					float3 N = normalize(i.normalInWorldCoords);
 					float3 V = normalize(_WorldSpaceCameraPos - P);
@@ -121,13 +120,14 @@ Shader "Custom/Terrain"
 
 
 
-					float3 dirt = tex2D(_DirtTex, i.uv).rgb;
+					float3 water = tex2D(_WaterTex, i.uv).rgb;
 					float3 grass = tex2D(_GrassTex, i.uv).rgb;
 					float3 snow = tex2D(_SnowTex, i.uv).rgb;
 
 					float3 textureColor;
 
-					if (i.heightVal < 0.5) {
+					//reflect skybox on water
+					if (i.heightVal < _WaterLevel) {
 
 						//get normalized incident ray (from camera to vertex)
 						float3 vIncident = normalize(P - _WorldSpaceCameraPos);
@@ -153,14 +153,12 @@ Shader "Custom/Terrain"
 						float4 refractColorBlue = texCUBE(_Cube, float3(vRefractBlue));
 						float4 refractColor = float4(refractColorRed.r, refractColorGreen.g, refractColorBlue.b, 1.0);
 
-						//return float4(lerp(reflectColor, refractColor, 0.5).rgb, 1.0);
+						textureColor = lerp(water, grass, i.heightVal * 2);
 
-						//textureColor = lerp(dirt, grass, i.heightVal * 2);
-
-						return refractColor;
+						textureColor = float4(lerp(reflectColor, textureColor, 0.5).rgb, 1.0);
 					}
 
-					if (i.heightVal >= 0.5) {
+					if (i.heightVal >= _WaterLevel) {
 
 						textureColor = lerp(grass, snow, i.heightVal * 2 - 1);
 					}
