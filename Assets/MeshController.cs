@@ -17,6 +17,7 @@ public class MeshController : MonoBehaviour
     int zSize = 5;
 
     float waterLevel = 0.5f;
+    float displacement = 1.0f;
 
     Mesh mesh;
     MeshFilter meshFilter;
@@ -51,6 +52,17 @@ public class MeshController : MonoBehaviour
             waterLevel = Mathf.Max(0.0f, waterLevel - 0.05f);
             material.SetFloat("_WaterLevel", waterLevel);
         }
+
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            displacement = Mathf.Max(0.1f, displacement - 0.1f);
+            material.SetFloat("_DisplacementAmt", displacement);
+        }
+        else if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            displacement = Mathf.Min(2.0f, displacement + 0.1f);
+            material.SetFloat("_DisplacementAmt", displacement);
+        }
     }
 
     private void CalculateTerrain()
@@ -71,7 +83,7 @@ public class MeshController : MonoBehaviour
         {
             for (int x = 0; x <= numCellsX; x++)
             {
-                float zVal = 0f;  //Random.Range(0.0f, 1.0f);
+                float zVal = 0f;
                 vertices[idx] = new Vector3(startX + xInc * x, zVal, startZ + zInc * z);
                 uv[idx] = new Vector2((float)x / (float)numCellsX, (float)z / (float)numCellsZ);
                 idx++;

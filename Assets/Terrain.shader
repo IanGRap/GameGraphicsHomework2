@@ -117,9 +117,6 @@ Shader "Custom/Terrain"
 					//FINAL LIGHT COLOR OF FRAGMENT
 					float3 lightColor = float3(ambient + diffuse + specular);
 
-
-
-
 					float3 water = tex2D(_WaterTex, i.uv).rgb;
 					float3 grass = tex2D(_GrassTex, i.uv).rgb;
 					float3 snow = tex2D(_SnowTex, i.uv).rgb;
@@ -135,27 +132,14 @@ Shader "Custom/Terrain"
 						//reflect that ray around the normal using built-in HLSL command
 						float3 vReflect = reflect(vIncident, i.normalInWorldCoords);
 
+						//vReflect.x = sin(vReflect. * 2 + _Time.y) * 0.4;
 
 						//use the reflect ray to sample the skybox
 						float4 reflectColor = texCUBE(_Cube, vReflect);
 
-						//refract the incident ray through the surface using built-in HLSL command
-						float3 vRefract = refract(vIncident, i.normalInWorldCoords, 0.5);
-
-						//float4 refractColor = texCUBE( _Cube, vRefract );
-
-						float3 vRefractRed = refract(vIncident, i.normalInWorldCoords, 0.1);
-						float3 vRefractGreen = refract(vIncident, i.normalInWorldCoords, 0.4);
-						float3 vRefractBlue = refract(vIncident, i.normalInWorldCoords, 0.7);
-
-						float4 refractColorRed = texCUBE(_Cube, float3(vRefractRed));
-						float4 refractColorGreen = texCUBE(_Cube, float3(vRefractGreen));
-						float4 refractColorBlue = texCUBE(_Cube, float3(vRefractBlue));
-						float4 refractColor = float4(refractColorRed.r, refractColorGreen.g, refractColorBlue.b, 1.0);
-
 						textureColor = lerp(water, grass, i.heightVal * 2);
 
-						textureColor = float4(lerp(reflectColor, textureColor, 0.5).rgb, 1.0);
+						textureColor = lerp(reflectColor, textureColor, 0.2).rgb;
 					}
 
 					if (i.heightVal >= _WaterLevel) {
