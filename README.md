@@ -23,4 +23,4 @@ Scene B:
   I downloaded the skybox from the asset store. I got the water texture from google images.
   Screenshot: (Assets/BScreenshot.png)
 
-Download: IanRapoport.com/IanRapoportHomework.zip
+Download: IanRapoport.com/IanRapoportHomework2.zip
